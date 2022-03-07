@@ -56,7 +56,7 @@ const updateRoomTopics = async (room, oldestCategory, newCat) => {
   )
 }
 
-cron.schedule('*/1 * * * *', async () => {
+cron.schedule('* * */24 * *', async () => {
   const posts = await Post.aggregate([
     {
       $addFields: { noOfVotes: { $size: '$votes' } }
