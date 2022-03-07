@@ -5,7 +5,14 @@ import { useTheme } from '@react-navigation/native'
 import categories from '../constants/categories'
 import { RoomContext } from '../context/roomContext'
 
-const CategoryPicker = ({ selectedCategory, onClick, addAll, setFieldValue, ...props }) => {
+const CategoryPicker = ({
+  selectedCategory,
+  onClick,
+  addAll,
+  setFieldValue,
+  defaultCategories,
+  ...props
+}) => {
   const { colors } = useTheme()
   const { activeRoom } = useContext(RoomContext)
 
@@ -18,8 +25,8 @@ const CategoryPicker = ({ selectedCategory, onClick, addAll, setFieldValue, ...p
               ? ['all', ...activeRoom.topics]
               : activeRoom.topics
             : addAll
-            ? ['all', ...categories]
-            : categories
+            ? ['all', ...defaultCategories]
+            : defaultCategories
         }
         horizontal
         keyExtractor={(item, index) => index.toString()}

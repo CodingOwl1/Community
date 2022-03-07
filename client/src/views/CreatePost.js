@@ -23,6 +23,7 @@ import CategoryPicker from '../components/CategoryPicker'
 import { RoomContext } from '../context/roomContext'
 import ImagePicker from 'react-native-image-crop-picker'
 import uploadImage from '../utils/uploadImage'
+import {getCategories} from "./Home";
 
 const TypeSwichContainer = ({ children }) => {
   return <View style={styles.typeContainer}>{children}</View>
@@ -64,6 +65,7 @@ const CreatePost = () => {
   const fadeAnim = React.useRef(new Animated.Value(0)).current
   const [swapEnabled, setSwapEnabled] = useState(false)
   const toggleSwitch = () => setSwapEnabled(previousState => !previousState)
+  const [defaultCategories, setDefaultCategories] = React.useState([])
 
   const fadeIn = () => {
     Animated.timing(fadeAnim, {
@@ -76,6 +78,14 @@ const CreatePost = () => {
       setMessage(null)
     }, 6000)
   }
+
+  React.useEffect(() => {
+    if (!activeRoom) {
+      getCategories().then(result => {
+        setDefaultCategories(result.data.data)
+      })
+    }
+  }, [activeRoom])
 
   return (
     <ScrollView as={SafeAreaView} style={[styles.container, { backgroundColor: colors.bgColor }]}>
@@ -184,7 +194,11 @@ const CreatePost = () => {
                 <Text style={styles.errorMessage}>{errors.category}</Text>
               )}
             </View>
-            <CategoryPicker selectedCategory={values.category} setFieldValue={setFieldValue} />
+            <CategoryPicker
+              defaultCategories={defaultCategories}
+              selectedCategory={values.category}
+              setFieldValue={setFieldValue}
+            />
 
             <View style={styles.flexRow}>
               <Text style={[styles.formLabel, { color: colors.text }]}>Title / Topic</Text>

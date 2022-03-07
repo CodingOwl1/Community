@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useCallback, useContext, useEffect } from 'react'
 import { StyleSheet, View, FlatList, Text, StatusBar, Linking } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useTheme } from '@react-navigation/native'
@@ -16,19 +16,34 @@ import { RoomContext } from '../context/roomContext'
 import instanceAxios from '../utils/fetcher'
 import messaging from '@react-native-firebase/messaging'
 
+export const getCategories = async () => {
+  return await axios.get('/default_category')
+}
+
+const updateRoomData = async activeRoom => {
+  const response = await instanceAxios.get(`room/${activeRoom.id}`)
+  const responseData = await response.data
+  if (responseData.status === 'error') {
+    return null
+  } else {
+    return responseData
+  }
+}
+
 const Home = ({ navigation }) => {
   const { authState } = useContext(AuthContext)
   const { theme } = useContext(ThemeContext)
   const { colors } = useTheme()
-  const { activeRoom } = useContext(RoomContext)
+  const { activeRoom, setActiveRoom } = useContext(RoomContext)
   const [postData, setPostData] = React.useState(null)
   const [category, setCategory] = React.useState('all')
   const [isLoading, setIsLoaading] = React.useState(false)
   const [showJoinRoom, setShowJoinRoom] = React.useState(false)
+  const [defaultCategories, setDefaultCategories] = React.useState([])
 
   useEffect(() => {
     checkNotification()
-  }, [])
+  }, [checkNotification])
 
   const checkNotification = async () => {
     messaging().onNotificationOpenedApp(remoteMessage => {
@@ -53,23 +68,33 @@ const Home = ({ navigation }) => {
     setIsLoaading(false)
   }, [category])
 
-  useEffect(() => {
-    if (activeRoom) handleActiveRoomPosts()
-    else getPostData()
-  }, [activeRoom])
-
-  const handleActiveRoomPosts = async () => {
+  const handleActiveRoomPosts = useCallback(async () => {
     console.log('getting room posts', activeRoom)
     const response = await instanceAxios.get(`room/posts/${activeRoom.id}`)
     const responseData = await response.data
     console.log('responseData', responseData)
-    if (responseData.status === 'error') return
+    if (responseData.status === 'error') {
+      return
+    }
     setPostData(responseData.data)
-  }
+  }, [activeRoom])
+
+  useEffect(() => {
+    if (activeRoom && category === 'all') {
+      handleActiveRoomPosts()
+    } else {
+      getPostData()
+    }
+  }, [activeRoom, getPostData, handleActiveRoomPosts, category])
 
   React.useEffect(() => {
-    if (!activeRoom) getPostData()
-  }, [getPostData])
+    if (!activeRoom) {
+      getPostData()
+      getCategories().then(result => {
+        setDefaultCategories(result.data.data)
+      })
+    }
+  }, [activeRoom, getPostData])
 
   React.useEffect(() => {
     Linking.getInitialURL().then(url => {
@@ -84,8 +109,9 @@ const Home = ({ navigation }) => {
             authState.userInfo &&
             authState.userInfo.rooms &&
             authState.userInfo.rooms.indexOf(id) !== -1
-          )
+          ) {
             return
+          }
           setShowJoinRoom(true)
         }
       }
@@ -99,18 +125,28 @@ const Home = ({ navigation }) => {
 
         if (type === 'invite') {
           console.log('invite', id, authState && authState.userInfo && authState.userInfo.rooms)
-          if (authState && authState.userInfo && authState.userInfo.rooms.indexOf(id) !== -1) return
+          if (authState && authState.userInfo && authState.userInfo.rooms.indexOf(id) !== -1) {
+            return
+          }
           console.log('setShowJoinRoom')
           setShowJoinRoom(true)
           console.log('showJoinRoom set to true')
         }
       }
     })
-  }, [])
+  }, [authState])
 
-  const onRefresh = () => {
-    if (activeRoom) handleActiveRoomPosts()
-    else getPostData()
+  const onRefresh = async () => {
+    if (activeRoom) {
+      handleActiveRoomPosts()
+      const result = await updateRoomData(activeRoom)
+      setActiveRoom(result.data)
+    } else {
+      getPostData()
+      getCategories().then(result => {
+        setDefaultCategories(result.data.data)
+      })
+    }
   }
 
   return (
@@ -128,7 +164,12 @@ const Home = ({ navigation }) => {
           onRefresh={onRefresh}
           keyExtractor={item => item.id}
           ListHeaderComponent={
-            <CategoryPicker selectedCategory={category} onClick={setCategory} addAll />
+            <CategoryPicker
+              selectedCategory={category}
+              defaultCategories={defaultCategories}
+              onClick={setCategory}
+              addAll
+            />
           }
           ListHeaderComponentStyle={[styles.categoryPicker, { backgroundColor: colors.bgColor }]}
           ListEmptyComponent={

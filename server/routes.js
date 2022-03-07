@@ -4,6 +4,7 @@ const votes = require('./controllers/votes');
 const comments = require('./controllers/comments');
 const rooms = require('./controllers/rooms');
 const reports = require('./controllers/reports');
+const defaultCategories = require('./controllers/defaultCategories');
 const blocks = require('./controllers/blocks');
 const requireAuth = require('./middlewares/requireAuth');
 const postAuth = require('./middlewares/postAuth');
@@ -40,6 +41,9 @@ router.get('/posts', posts.list);
 router.get('/posts/:category', posts.listByCategory);
 router.get('/user/:username', posts.listByUser);
 router.delete('/post/:post', [requireAuth, postAuth], posts.delete);
+
+// default categories
+router.get('/default_category', defaultCategories.getDefaultCategory);
 
 //Post votes
 router.get('/post/:post/upvote', requireAuth, votes.upvote);

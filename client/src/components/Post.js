@@ -176,7 +176,7 @@ const Post = ({
 
       <View style={styles.bottomContainer}>
         <View style={styles.centerAlign}>
-          <TouchableOpacity onPress={() => (isUpVoted() ? unVote() : upVote())}>
+          <TouchableOpacity onPress={() => (isUpVoted() ? upVote() : upVote())}>
             <ArrowUp
               width={22}
               height={22}

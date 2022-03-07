@@ -1,9 +1,62 @@
 const cron = require('node-cron');
 const Post = require('./models/post');
 const Room = require('./models/room');
+const DefaultCategory = require('./models/defaultCategory');
 const sortArray = require('sort-array');
 
-cron.schedule('* * */1 * *', async () => {
+const DEFAULT_CAT = [
+  'music',
+  'funny',
+  'videos',
+  'programming',
+  'news',
+  'fashion'
+]
+
+const deletePostsByCategory = async (cat) => {
+  await Post.deleteMany({ category : cat})
+}
+
+const updateDefaultCategoryById = async (defaultCategories, oldestCategory, newCat, id) => {
+  const removeIndex = defaultCategories.indexOf(oldestCategory);
+  if(removeIndex > -1){
+    defaultCategories.splice(removeIndex, 1);
+  }
+  const newDefaultCat = [newCat, ...defaultCategories];
+
+  await DefaultCategory.findOneAndUpdate(
+      {_id : id},
+      {
+        categories : newDefaultCat,
+      },
+  )
+}
+
+const updatePostById = async (topPost) => {
+  const post = await Post.findById({ _id: topPost._id });
+  if(post){
+    post.category = topPost.title;
+    await post.save();
+  }
+}
+
+const updateRoomTopics = async (room, oldestCategory, newCat) => {
+  const removeIndex = room.topics.indexOf(oldestCategory);
+  let topics = room.topics;
+  if(removeIndex > -1){
+    topics.splice(removeIndex, 1);
+  }
+  const newTopics = [newCat, ...topics];
+
+  await Room.findOneAndUpdate(
+      {_id : room._id},
+      {
+        topics: newTopics,
+      },
+  )
+}
+
+cron.schedule('*/1 * * * *', async () => {
   const posts = await Post.aggregate([
     {
       $addFields: { noOfVotes: { $size: '$votes' } }
@@ -12,7 +65,7 @@ cron.schedule('* * */1 * *', async () => {
       $match: { swap: true }
     },
     {
-      $sort: { noOfVotes: -1 }
+      $sort: { score: -1 }
     },
     {
       $limit: 1
@@ -20,23 +73,33 @@ cron.schedule('* * */1 * *', async () => {
   ]);
   if (!posts.length) return;
   const topPost = posts[0];
-  let oldestCategory;
+
+  let oldestCategory, result, defaultCategories, room;
   if (topPost.inRoom) {
-    const room = await Room.findById(topPost.inRoom);
-    oldestCategory = await getOldestCategory(room.topics);
+    room = await Room.findById(topPost.inRoom);
+    defaultCategories = room.topics
+    oldestCategory = await getOldestCategory(defaultCategories);
   } else {
-    oldestCategory = await getOldestCategory([
-      'music',
-      'funny',
-      'videos',
-      'programming',
-      'news',
-      'fashion'
-    ]);
+    result = await DefaultCategory.find({})
+    defaultCategories = result[0].categories || DEFAULT_CAT
+    oldestCategory = await getOldestCategory(defaultCategories);
   }
-  const post = await Post.findById(topPost._id);
-  post.title = oldestCategory;
-  await post.save();
+
+  if(!defaultCategories.includes(topPost.title)){
+
+    // update highest up voted post with new category
+    await updatePostById(topPost);
+
+    // delete old category posts and comments
+    await deletePostsByCategory(oldestCategory);
+
+    // update default categories
+    if(topPost.inRoom){
+      await updateRoomTopics(room, oldestCategory, topPost.title);
+    }else{
+      await updateDefaultCategoryById(defaultCategories, oldestCategory, topPost.title, result[0]._id);
+    }
+  }
 });
 
 const getOldestCategory = async (topics) => {
