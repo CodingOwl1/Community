@@ -101,3 +101,26 @@ exports.getRoomPosts = async (req, res) => {
     });
   }
 };
+
+exports.updateRoomBannerImage = async (req, res) => {
+  try {
+    const { imageUrl, roomId } = req.body;
+    console.log('getting for ', imageUrl, roomId);
+
+    const room = await Room.findOneAndUpdate(
+        {_id : roomId},
+        {
+          bannerImage: imageUrl,
+        }
+    )
+    res.send({
+      status: 'success',
+      data: room
+    });
+  } catch (error) {
+    return res.status(400).json({
+      status: 'error',
+      message: 'Something went wrong.'
+    });
+  }
+};

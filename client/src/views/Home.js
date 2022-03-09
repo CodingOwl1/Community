@@ -15,6 +15,7 @@ import JoinRoom from '../components/JoinRoom'
 import { RoomContext } from '../context/roomContext'
 import instanceAxios from '../utils/fetcher'
 import messaging from '@react-native-firebase/messaging'
+import BannerImage from '../components/BannerImage'
 
 export const getCategories = async () => {
   return await axios.get('/default_category')
@@ -28,6 +29,20 @@ const updateRoomData = async activeRoom => {
   } else {
     return responseData
   }
+}
+
+const Header = ({ category, defaultCategories, setCategory, imageSrc, onRefresh }) => {
+  return (
+    <>
+      <BannerImage imageSrc={imageSrc} onRefresh={onRefresh} />
+      <CategoryPicker
+        selectedCategory={category}
+        defaultCategories={defaultCategories}
+        onClick={setCategory}
+        addAll
+      />
+    </>
+  )
 }
 
 const Home = ({ navigation }) => {
@@ -164,11 +179,12 @@ const Home = ({ navigation }) => {
           onRefresh={onRefresh}
           keyExtractor={item => item.id}
           ListHeaderComponent={
-            <CategoryPicker
-              selectedCategory={category}
+            <Header
+              category={category}
               defaultCategories={defaultCategories}
-              onClick={setCategory}
-              addAll
+              setCategory={setCategory}
+              imageSrc={activeRoom ? activeRoom.bannerImage : ''}
+              onRefresh={onRefresh}
             />
           }
           ListHeaderComponentStyle={[styles.categoryPicker, { backgroundColor: colors.bgColor }]}

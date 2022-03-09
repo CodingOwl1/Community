@@ -1,6 +1,6 @@
 export { default as ArrowDown } from './ArrowDown'
 export { default as ArrowUp } from './ArrowUp'
-export { default as FurnitureAndHousehold } from './FurnitureAndHousehold'
+export { default as Edit } from './Edit'
 export { default as Home } from './Home'
 export { default as LogIn } from './LogIn'
 export { default as LogOut } from './LogOut'
