@@ -34,13 +34,13 @@ const updateRoomData = async activeRoom => {
 const Header = ({ category, defaultCategories, setCategory, imageSrc, onRefresh }) => {
   return (
     <>
-      <BannerImage imageSrc={imageSrc} onRefresh={onRefresh} />
       <CategoryPicker
         selectedCategory={category}
         defaultCategories={defaultCategories}
         onClick={setCategory}
         addAll
       />
+      <BannerImage imageSrc={imageSrc} onRefresh={onRefresh} />
     </>
   )
 }
