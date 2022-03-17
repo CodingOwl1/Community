@@ -93,7 +93,9 @@ export default function CreateRoom({ visible, setVisible }) {
         avatar: result[0].url,
         topics,
         members: [authState.userInfo.id],
-        bannerImage: result[1] ? result[1].url : ''
+        bannerImage: result[1] ? result[1].url : '',
+        ownerId: authState.userInfo.id,
+        links: ['', '']
       },
       userId: authState.userInfo.id
     }

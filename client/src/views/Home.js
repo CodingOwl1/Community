@@ -16,6 +16,7 @@ import { RoomContext } from '../context/roomContext'
 import instanceAxios from '../utils/fetcher'
 import messaging from '@react-native-firebase/messaging'
 import BannerImage from '../components/BannerImage'
+import MainLinks from "../components/MainLinks";
 
 export const getCategories = async () => {
   return await axios.get('/default_category')
@@ -41,6 +42,7 @@ const Header = ({ category, defaultCategories, setCategory, imageSrc, onRefresh 
         addAll
       />
       <BannerImage imageSrc={imageSrc} onRefresh={onRefresh} />
+      <MainLinks onRefresh={onRefresh} />
     </>
   )
 }
