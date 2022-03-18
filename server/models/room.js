@@ -6,7 +6,9 @@ const roomModel = new Schema({
   avatar: { type: String, required: true },
   bannerImage: { type: String, required: false },
   topics: { type: Array, required: true },
-  members: { type: Array, required: true }
+  members: { type: Array, required: true },
+  ownerId: { type: String },
+  links: { type: Array, default: ['', ''] },
 });
 
 roomModel.set('toJSON', { getters: true });
