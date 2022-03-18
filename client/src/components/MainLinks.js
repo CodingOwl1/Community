@@ -37,7 +37,7 @@ const MainLinks = ({ onRefresh }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.text}>
-        Link:{' '}
+        Funded Local Link:{' '}
         {getLink(0) ? (
           <TouchableOpacity onPress={() => handleClick(getLink(0))}>
             <Text style={styles.label} numberOfLines={1} ellipsizeMode="tail">
@@ -47,7 +47,7 @@ const MainLinks = ({ onRefresh }) => {
         ) : null}
       </Text>
       <Text style={styles.text}>
-        Link:{' '}
+        Funded Local Link:{' '}
         {getLink(1) ? (
           <TouchableOpacity onPress={() => handleClick(getLink(1))}>
             <Text style={styles.label} numberOfLines={1} ellipsizeMode="tail">
@@ -92,7 +92,8 @@ const styles = StyleSheet.create({
   },
   label: {
     fontWeight: 'bold',
-    textDecorationLine: 'underline'
+    textDecorationLine: 'underline',
+    width: 230
   }
 })
 
