@@ -16,7 +16,7 @@ import { RoomContext } from '../context/roomContext'
 import instanceAxios from '../utils/fetcher'
 import messaging from '@react-native-firebase/messaging'
 import BannerImage from '../components/BannerImage'
-import MainLinks from "../components/MainLinks";
+import MainLinks from '../components/MainLinks'
 
 export const getCategories = async () => {
   return await axios.get('/default_category')
@@ -78,10 +78,14 @@ const Home = ({ navigation }) => {
 
   const getPostData = React.useCallback(async () => {
     setIsLoaading(true)
-    const { data } = await axios.get(
-      !category || category === 'all' ? 'posts' : `posts/${category}`
-    )
-    setPostData(data)
+    try {
+      const { data } = await axios.get(
+        !category || category === 'all' ? 'posts' : `posts/${category}`
+      )
+      setPostData(data)
+    } catch (error) {
+      console.log('Error', error)
+    }
     setIsLoaading(false)
   }, [category])
 

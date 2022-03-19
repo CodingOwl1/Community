@@ -47,7 +47,7 @@ const MainLinks = ({ onRefresh }) => {
         ) : null}
       </Text>
       <Text style={styles.text}>
-        Funded Local Link:{' '}
+        Link 1:{' '}
         {getLink(1) ? (
           <TouchableOpacity onPress={() => handleClick(getLink(1))}>
             <Text style={styles.label} numberOfLines={1} ellipsizeMode="tail">
