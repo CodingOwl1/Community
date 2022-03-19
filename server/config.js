@@ -1,7 +1,7 @@
 module.exports = {
   port: 8080,
   db: {
-    prod: process.env.DATABASE_URL || 'mongodb://localhost/reddit-clone',
+    prod: 'mongodb+srv://test1:test1@cluster0.wsfac.mongodb.net/myFirstDatabase?retryWrites=true&w=majority' || 'mongodb://localhost/reddit-clone',
     test: 'mongodb://localhost/reddit-test',
     options: {
       useNewUrlParser: true,

@@ -3,7 +3,11 @@ const mongoose = require('mongoose');
 const config = require('./config');
 
 const connect = (url) => {
-  return mongoose.connect(url, config.db.options);
+  return mongoose.connect(url, config.db.options).then(() => {
+    console.log('Mongo Conneted')
+  }).catch((error) => {
+    console.log('Error', error)
+  });
 };
 
 if (require.main === module) {
