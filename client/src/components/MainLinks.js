@@ -36,8 +36,8 @@ const MainLinks = ({ onRefresh }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>
-        Funded Local Link:{' '}
+      <View style={styles.text}>
+        <Text>Funded Local Link:{' '}</Text>
         {getLink(0) ? (
           <TouchableOpacity onPress={() => handleClick(getLink(0))}>
             <Text style={styles.label} numberOfLines={1} ellipsizeMode="tail">
@@ -45,9 +45,9 @@ const MainLinks = ({ onRefresh }) => {
             </Text>
           </TouchableOpacity>
         ) : null}
-      </Text>
-      <Text style={styles.text}>
-        Link 1:{' '}
+      </View>
+      <View style={styles.text}>
+        <Text>Link 1:{' '}</Text>
         {getLink(1) ? (
           <TouchableOpacity onPress={() => handleClick(getLink(1))}>
             <Text style={styles.label} numberOfLines={1} ellipsizeMode="tail">
@@ -55,7 +55,7 @@ const MainLinks = ({ onRefresh }) => {
             </Text>
           </TouchableOpacity>
         ) : null}
-      </Text>
+      </View>
       {activeRoom && authState && activeRoom?.ownerId === authState.userInfo.id ? (
         <>
           <TouchableOpacity style={styles.editIcon} onPress={() => setVisible(true)}>
@@ -79,10 +79,14 @@ const styles = StyleSheet.create({
     position: 'relative'
   },
   text: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     fontSize: 14,
     marginBottom: 5,
     color: 'rgb(28, 28, 30)',
-    fontWeight: 'normal'
+    fontWeight: 'normal',
+    width: '100%'
   },
   editIcon: {
     position: 'absolute',
@@ -93,7 +97,7 @@ const styles = StyleSheet.create({
   label: {
     fontWeight: 'bold',
     textDecorationLine: 'underline',
-    width: 230
+    maxWidth: 200
   }
 })
 
